@@ -8,8 +8,8 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const getPageQuery = () => {
-    if (Number(route.query.page) > pagesAmount) {
-        return pagesAmount;
+    if (Number(route.query.page) > cardPerPage) {
+        return cardPerPage;
     } else if (Number(route.query.page) < 1) {
         return 1;
     } else {
@@ -18,8 +18,8 @@ const getPageQuery = () => {
 };
 
 const data = ref();
-const dataLen = ref();
-const pagesAmount = 10;
+const dataLen = ref(1);
+const cardPerPage = 5;
 const currentPage = ref(getPageQuery());
 const GET_PRODUCTS_FROM_API = async () => {
     const urlMain = 'https://jsonplaceholder.typicode.com/posts';
@@ -44,10 +44,14 @@ onMounted(() => {
 });
 
 const paginatedData = computed(() => {
-    const start = (currentPage.value - 1) * pagesAmount;
-    const end = start + pagesAmount;
+    const start = (currentPage.value - 1) * cardPerPage;
+    const end = start + cardPerPage;
 
     if (data.value) return data.value.slice(start, end);
+});
+
+const pages = computed(() => {
+    return Math.ceil(dataLen.value / cardPerPage);
 });
 
 const stopPrev = computed(() => {
@@ -55,7 +59,7 @@ const stopPrev = computed(() => {
 });
 
 const stopNext = computed(() => {
-    return currentPage.value === dataLen.value / pagesAmount;
+    return currentPage.value === pages.value;
 });
 
 const nextPage = () => {
@@ -91,7 +95,7 @@ const goToPage = (n) => {
                         ? 'button button--pages button--current'
                         : 'button button--pages'
                 "
-                v-for="n in pagesAmount"
+                v-for="n in pages"
                 @click="goToPage(n)"
                 :to="{ path: '/', query: { page: n } }"
                 >{{ n }}</RouterLink
