@@ -3,15 +3,21 @@ import axios from 'axios';
 import { computed, onMounted, ref } from 'vue';
 import Card from './Card.vue';
 import { RouterLink } from 'vue-router';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
+
+const pages = computed(() => {
+    return Math.ceil(dataLen.value / cardPerPage);
+});
 
 const getPageQuery = () => {
-    if (Number(route.query.page) > cardPerPage) {
-        return cardPerPage;
-    } else if (Number(route.query.page) < 1) {
-        return 1;
+    if (
+        Number(route.query.page) > pages.value ||
+        Number(route.query.page) < 1
+    ) {
+        router.push({ path: '/404' });
     } else {
         return Number(route.query.page) || 1;
     }
@@ -19,7 +25,7 @@ const getPageQuery = () => {
 
 const data = ref();
 const dataLen = ref(1);
-const cardPerPage = 5;
+const cardPerPage = 10;
 const currentPage = ref(getPageQuery());
 const GET_PRODUCTS_FROM_API = async () => {
     const urlMain = 'https://jsonplaceholder.typicode.com/posts';
@@ -48,10 +54,6 @@ const paginatedData = computed(() => {
     const end = start + cardPerPage;
 
     if (data.value) return data.value.slice(start, end);
-});
-
-const pages = computed(() => {
-    return Math.ceil(dataLen.value / cardPerPage);
 });
 
 const stopPrev = computed(() => {
