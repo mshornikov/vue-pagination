@@ -7,10 +7,20 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute();
 
+const getPageQuery = () => {
+    if (Number(route.query.page) > pagesAmount) {
+        return pagesAmount;
+    } else if (Number(route.query.page) < 1) {
+        return 1;
+    } else {
+        return Number(route.query.page) || 1;
+    }
+};
+
 const data = ref();
 const dataLen = ref();
-const currentPage = ref(Number(route.query.page) || 1);
 const pagesAmount = 10;
+const currentPage = ref(getPageQuery());
 const GET_PRODUCTS_FROM_API = async () => {
     const urlMain = 'https://jsonplaceholder.typicode.com/posts';
     try {
@@ -99,7 +109,7 @@ const goToPage = (n) => {
 <style scoped>
 .pagination-group {
     display: flex;
-    gap: 20px;
+    gap: 40px;
 }
 
 .pages-group {
