@@ -1,9 +1,11 @@
-<script setup>
-import List from './components/List.vue';
-</script>
+<script setup></script>
 
 <template>
     <RouterView></RouterView>
 </template>
 
-<style scoped></style>
+<style>
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+</style>

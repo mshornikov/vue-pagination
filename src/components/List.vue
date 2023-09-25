@@ -3,10 +3,13 @@ import axios from 'axios';
 import { computed, onMounted, ref } from 'vue';
 import Card from './Card.vue';
 import { RouterLink } from 'vue-router';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 const data = ref();
 const dataLen = ref();
-const currentPage = ref(1);
+const currentPage = ref(Number(route.query.page) || 1);
 const pagesAmount = 10;
 const GET_PRODUCTS_FROM_API = async () => {
     const urlMain = 'https://jsonplaceholder.typicode.com/posts';
@@ -59,19 +62,71 @@ const goToPage = (n) => {
 </script>
 
 <template>
-    <!-- <pre>{{ data }}</pre> -->
     <Card
         v-for="(card, index) in paginatedData"
         :card-data="card"
         :key="index"
     />
-    <button @click="prevPage" :disabled="stopPrev">-</button>
-    <button v-for="n in pagesAmount" @click="goToPage(n)">{{ n }}</button>
-    <input type="number" v-model="currentPage" min="1" :max="pagesAmount" />
-    <button @click="nextPage" :disabled="stopNext">+</button>
-    <RouterLink :to="{ path: '/posts', query: { page: nextPage } }"
-        >Туда</RouterLink
-    >
+    <div class="pagination-group">
+        <RouterLink
+            :class="!stopPrev ? 'button' : 'button button--disabled'"
+            @click="prevPage"
+            :to="{ path: '/', query: { page: currentPage - 1 } }"
+            >Назад</RouterLink
+        >
+        <div class="pages-group">
+            <RouterLink
+                :class="
+                    currentPage === n
+                        ? 'button button--pages button--current'
+                        : 'button button--pages'
+                "
+                v-for="n in pagesAmount"
+                @click="goToPage(n)"
+                :to="{ path: '/', query: { page: n } }"
+                >{{ n }}</RouterLink
+            >
+        </div>
+        <RouterLink
+            :class="!stopNext ? 'button' : 'button button--disabled'"
+            @click="nextPage"
+            :to="{ path: '/', query: { page: currentPage + 1 } }"
+            >Вперёд</RouterLink
+        >
+    </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.pagination-group {
+    display: flex;
+    gap: 20px;
+}
+
+.pages-group {
+    display: flex;
+    gap: 10px;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    background-color: slateblue;
+
+    border-radius: 5px;
+}
+
+.button--pages {
+    background-color: mediumpurple;
+}
+
+.button--current {
+    background-color: darkviolet;
+}
+
+.button--disabled {
+    pointer-events: none;
+    background-color: dimgray;
+}
+</style>
