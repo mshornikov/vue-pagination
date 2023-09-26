@@ -1,0 +1,5 @@
+{
+    "*.{css, scss, vue}": "npm run lint:css",
+    "*.{js, jsx, ts, tsx, vue}": "npm run lint:es",
+    "*": "npm run prettier"
+}

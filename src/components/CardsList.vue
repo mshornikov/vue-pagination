@@ -1,68 +1,44 @@
 <script setup>
 import axios from 'axios';
 import { computed, onMounted, ref } from 'vue';
-import Card from './Card.vue';
-import { RouterLink } from 'vue-router';
-import { useRoute, useRouter } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
+import Card from './CardItem.vue';
 
 const route = useRoute();
-const router = useRouter();
+const cardPerPage = 10;
 
-const pages = computed(() => {
-    return Math.ceil(dataLen.value / cardPerPage);
+const dataLen = ref(1);
+
+const pages = computed(() => Math.ceil(dataLen.value / cardPerPage));
+
+const data = ref([{ id: 0, title: 'Неизвестно' }]);
+const currentPage = ref(Number(route.query.page) || 1);
+
+const paginatedData = computed(() => {
+    const start = (currentPage.value - 1) * cardPerPage;
+    const end = start + cardPerPage;
+
+    return data.value.slice(start, end);
 });
 
-const getPageQuery = () => {
-    if (
-        Number(route.query.page) > pages.value ||
-        Number(route.query.page) < 1
-    ) {
-        router.push({ path: '/404' });
-    } else {
-        return Number(route.query.page) || 1;
-    }
-};
-
-const data = ref();
-const dataLen = ref(1);
-const cardPerPage = 10;
-const currentPage = ref(getPageQuery());
 const GET_PRODUCTS_FROM_API = async () => {
     const urlMain = 'https://jsonplaceholder.typicode.com/posts';
-    try {
-        try {
-            const response = await axios(urlMain, {
-                method: 'GET',
-                timeout: 1000,
-            });
-            data.value = response.data;
-            dataLen.value = response.data.length;
-            return paginatedData;
-        } finally {
-        }
-    } catch (error) {
-        console.log(error, 'Wrong data from API');
-    }
+    const response = await axios(urlMain, {
+        method: 'GET',
+        timeout: 1000,
+    });
+    data.value = response.data;
+    dataLen.value = response.data.length;
+    return paginatedData;
 };
 
 onMounted(() => {
     GET_PRODUCTS_FROM_API();
 });
 
-const paginatedData = computed(() => {
-    const start = (currentPage.value - 1) * cardPerPage;
-    const end = start + cardPerPage;
+const stopPrev = computed(() => currentPage.value === 1);
 
-    if (data.value) return data.value.slice(start, end);
-});
-
-const stopPrev = computed(() => {
-    return currentPage.value == 1;
-});
-
-const stopNext = computed(() => {
-    return currentPage.value === pages.value;
-});
+const stopNext = computed(() => currentPage.value === pages.value);
 
 const nextPage = () => {
     currentPage.value += 1;
@@ -80,33 +56,33 @@ const goToPage = (n) => {
 <template>
     <Card
         v-for="(card, index) in paginatedData"
-        :card-data="card"
         :key="index"
-    />
+        :card-data="card" />
     <div class="pagination-group">
         <RouterLink
             :class="!stopPrev ? 'button' : 'button button--disabled'"
-            @click="prevPage"
             :to="{ path: '/', query: { page: currentPage - 1 } }"
+            @click="prevPage"
             >Назад</RouterLink
         >
         <div class="pages-group">
             <RouterLink
+                v-for="(n, index) in pages"
+                :key="index"
                 :class="
                     currentPage === n
                         ? 'button button--pages button--current'
                         : 'button button--pages'
                 "
-                v-for="n in pages"
-                @click="goToPage(n)"
                 :to="{ path: '/', query: { page: n } }"
+                @click="goToPage(n)"
                 >{{ n }}</RouterLink
             >
         </div>
         <RouterLink
             :class="!stopNext ? 'button' : 'button button--disabled'"
-            @click="nextPage"
             :to="{ path: '/', query: { page: currentPage + 1 } }"
+            @click="nextPage"
             >Вперёд</RouterLink
         >
     </div>
@@ -125,11 +101,13 @@ const goToPage = (n) => {
 
 .button {
     display: inline-block;
+
     padding: 10px 15px;
+
     color: white;
     text-decoration: none;
-    background-color: slateblue;
 
+    background-color: slateblue;
     border-radius: 5px;
 }
 

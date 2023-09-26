@@ -2,15 +2,8 @@
 
 ### TODO
 
+-   Разбить на компоненты и добавить пропсы
 -   Улучшить загрузку данных
--   Добавить eslint
--   Добавить browserlist
--   Добавить editorconfig
--   Добавить eslint
--   Добавить stylelint
--   Добавить prettier
--   Добавить husky + lintstaged
--   Добавить typescript
 -   Исправить проблему с историей
 -   Добавить typescript
 
@@ -18,6 +11,12 @@
 
 ### Done
 
+-   ~~Добавить husky + lintstaged~~
+-   ~~Добавить prettier~~
+-   ~~Добавить stylelint~~
+-   ~~Добавить browserlist~~
+-   ~~Добавить eslint~~
+-   ~~Добавить editorconfig~~
 -   ~~Обработка ошибок~~
 -   ~~Пагинация с рутингом~~
 -   ~~Обычная пагинация~~

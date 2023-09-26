@@ -4,11 +4,13 @@
 </template>
 <style scoped>
 .error {
-    margin: auto;
     width: fit-content;
-    background-color: red;
+    margin: auto;
+    padding-block: 5px;
+
     font-weight: bold;
     color: white;
-    padding-block: 5px;
+
+    background-color: red;
 }
 </style>

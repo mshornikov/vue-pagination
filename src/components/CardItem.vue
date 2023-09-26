@@ -1,6 +1,11 @@
 <script setup>
 defineProps({
-    cardData: Object,
+    cardData: {
+        type: Object,
+        default() {
+            return { id: 0, title: 'Неизвестно' };
+        },
+    },
 });
 </script>
 <template>

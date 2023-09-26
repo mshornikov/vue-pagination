@@ -1,0 +1,14 @@
+node_modules
+.gitignore
+.browserslistrc
+.eslintignore
+.editorconfig
+.prettierignore
+.stylelintignore
+.stylelintcache
+.husky
+.idea
+
+public
+
+*.html
