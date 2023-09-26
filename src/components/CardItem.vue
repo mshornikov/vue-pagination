@@ -12,4 +12,3 @@ defineProps({
     <h2>{{ cardData.id }}</h2>
     <p>{{ cardData.title }}</p>
 </template>
-<style scoped></style>

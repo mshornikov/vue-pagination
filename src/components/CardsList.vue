@@ -1,39 +1,46 @@
 <script setup>
-import axios from 'axios';
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import Card from './CardItem.vue';
 
 const route = useRoute();
+
+const props = defineProps({
+    fetchData: {
+        type: Function,
+        required: true,
+    },
+});
+
+const isLoaded = ref(false);
+const isError = ref(false);
+const data = ref([{ id: 0, title: 'None' }]);
+
 const cardPerPage = 10;
 
-const dataLen = ref(1);
+const pages = computed(() =>
+    isLoaded.value ? Math.ceil(data.value.length / cardPerPage) : 1,
+);
 
-const pages = computed(() => Math.ceil(dataLen.value / cardPerPage));
+onMounted(async () => {
+    try {
+        data.value = await props.fetchData();
+        isLoaded.value = true;
+        if (Number(route.query.page) > pages.value) {
+            isError.value = true;
+        }
+    } catch {
+        isError.value = true;
+    }
+});
 
-const data = ref([{ id: 0, title: 'Неизвестно' }]);
 const currentPage = ref(Number(route.query.page) || 1);
 
 const paginatedData = computed(() => {
     const start = (currentPage.value - 1) * cardPerPage;
     const end = start + cardPerPage;
 
-    return data.value.slice(start, end);
-});
-
-const GET_PRODUCTS_FROM_API = async () => {
-    const urlMain = 'https://jsonplaceholder.typicode.com/posts';
-    const response = await axios(urlMain, {
-        method: 'GET',
-        timeout: 1000,
-    });
-    data.value = response.data;
-    dataLen.value = response.data.length;
-    return paginatedData;
-};
-
-onMounted(() => {
-    GET_PRODUCTS_FROM_API();
+    return isLoaded.value ? data.value.slice(start, end) : 0;
 });
 
 const stopPrev = computed(() => currentPage.value === 1);
@@ -54,38 +61,43 @@ const goToPage = (n) => {
 </script>
 
 <template>
-    <Card
-        v-for="(card, index) in paginatedData"
-        :key="index"
-        :card-data="card" />
-    <div class="pagination-group">
-        <RouterLink
-            :class="!stopPrev ? 'button' : 'button button--disabled'"
-            :to="{ path: '/', query: { page: currentPage - 1 } }"
-            @click="prevPage"
-            >Назад</RouterLink
-        >
-        <div class="pages-group">
+    <div v-if="isLoaded && !isError">
+        <Card
+            v-for="(card, index) in paginatedData"
+            :key="index"
+            :card-data="card" />
+
+        <div class="pagination-group">
             <RouterLink
-                v-for="(n, index) in pages"
-                :key="index"
-                :class="
-                    currentPage === n
-                        ? 'button button--pages button--current'
-                        : 'button button--pages'
-                "
-                :to="{ path: '/', query: { page: n } }"
-                @click="goToPage(n)"
-                >{{ n }}</RouterLink
+                :class="!stopPrev ? 'button' : 'button button--disabled'"
+                :to="{ path: '/', query: { page: currentPage - 1 } }"
+                @click="prevPage"
+                >Назад</RouterLink
+            >
+            <div class="pages-group">
+                <RouterLink
+                    v-for="(n, index) in pages"
+                    :key="index"
+                    :class="
+                        currentPage === n
+                            ? 'button button--pages button--current'
+                            : 'button button--pages'
+                    "
+                    :to="{ path: '/', query: { page: n } }"
+                    @click="goToPage(n)"
+                    >{{ n }}</RouterLink
+                >
+            </div>
+            <RouterLink
+                :class="!stopNext ? 'button' : 'button button--disabled'"
+                :to="{ path: '/', query: { page: currentPage + 1 } }"
+                @click="nextPage"
+                >Вперёд</RouterLink
             >
         </div>
-        <RouterLink
-            :class="!stopNext ? 'button' : 'button button--disabled'"
-            :to="{ path: '/', query: { page: currentPage + 1 } }"
-            @click="nextPage"
-            >Вперёд</RouterLink
-        >
     </div>
+    <div v-else-if="!isError">Загрузка...</div>
+    <div v-if="isError">ОШИБКА</div>
 </template>
 
 <style scoped>
