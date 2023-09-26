@@ -2,7 +2,7 @@
 
 Пагинация на Vue с рутингом
 
-Компонент [`List`](/src/components/List.vue)
+Компонент [`CardsList`](/src/components/CardsList.vue)
 
 ## Начало работы
 
