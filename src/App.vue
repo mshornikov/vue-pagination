@@ -1,5 +1,5 @@
 <script setup>
-const getProductsFromApi = async () => {
+const getDataFromApi = async () => {
     const urlMain = 'https://jsonplaceholder.typicode.com/posts';
     const response = await fetch(urlMain);
     const data = await response.json();
@@ -8,7 +8,7 @@ const getProductsFromApi = async () => {
 </script>
 
 <template>
-    <RouterView :fetch-data="getProductsFromApi"></RouterView>
+    <RouterView :fetch-data="getDataFromApi"></RouterView>
 </template>
 
 <style>

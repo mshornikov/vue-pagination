@@ -2,8 +2,6 @@
 
 Пагинация на Vue с рутингом
 
-Компонент [`CardsList`](/src/components/CardsList.vue)
-
 ## Начало работы
 
 `npm i` - установка зависимостей
